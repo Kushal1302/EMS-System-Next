@@ -1,80 +1,73 @@
-"use client"
-import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import Head from "next/head";
+"use client";
+import Image, { type StaticImageData } from "next/image";
+import React, { useState } from "react";
+import loginBanner from "../assets/login.jpg";
+import { FaGithub } from "react-icons/fa";
+import { signIn } from "next-auth/react";
 
 const Login = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    setError(null);
-
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+  });
+  const handleChange = (e: any) => {
+    setData({
+      ...data,
+      [e.target.name]: e.target.value,
     });
   };
-
+  const handleSubmit = () => {
+    signIn("credentials", {
+      email: data.email,
+      password: data.password,
+    });
+  };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <Head>
-        <title>Login</title>
-      </Head>
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
-        {error && <div className="mb-4 text-red-500">{error}</div>}
-        <button
-          onClick={() => signIn("github")}
-          className="w-full bg-black text-white py-2 px-4 rounded hover:bg-gray-800 mb-4"
-        >
-          Login with GitHub
-        </button>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <input
-              type="text"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
-          </div>
+    <div className="min-h-screen flex flex-col md:flex-row">
+      <div className="md:w-1/2 lg:w-2/3 flex items-center justify-center overflow-hidden">
+        <Image
+          src={loginBanner as StaticImageData}
+          alt="login"
+          layout="responsive"
+          className="w-full h-auto"
+        />
+      </div>
+      <div className="md:w-1/2 lg:w-1/3 flex items-center justify-center bg-gray-100 p-8">
+        <div className="w-full max-w-md">
+          <h1 className="text-3xl font-bold mb-8 text-center">Login</h1>
+          <input
+            type="text"
+            name="email"
+            placeholder="Email"
+            className="w-full p-2 border border-gray-300 rounded mb-4"
+            onChange={handleChange}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            className="w-full p-2 border border-gray-300 rounded mb-4"
+            onChange={handleChange}
+          />
           <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            className="w-full p-2 bg-blue-500 text-white rounded mb-4"
+            onClick={handleSubmit}
           >
             Login
           </button>
-        </form>
+          <div className="flex items-center justify-center my-4">
+            <hr className="flex-grow border-gray-300" />
+            <span className="mx-2 text-gray-500">or</span>
+            <hr className="flex-grow border-gray-300" />
+          </div>
+          <button
+            className="w-full p-2 flex items-center justify-center bg-black text-white rounded"
+            onClick={() => signIn("github")}
+          >
+            <FaGithub className="mr-2" />
+            Login with GitHub
+          </button>
+        </div>
       </div>
     </div>
   );
